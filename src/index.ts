@@ -4,7 +4,7 @@ import bodyParser from "body-parser"
 const app = express()
 const port = process.env.PORT || 3000
 
-app.use(bodyParser.json())
+app.use(express.json())
 
 /*enum Resolutions {
     P144,
@@ -32,7 +32,7 @@ type FieldError = {
 }
 type APIErrorResult = Array<FieldError>
 
-const videos = [
+let videos = [
     {
         id: 1,
         title: "Funny Cats",
@@ -64,6 +64,7 @@ const videos = [
         availableResolutions: ["P480", "P1440", "P2160"]
     }
 ]
+const errorsMessages: APIErrorResult = []
 
 app.get('/hometask_01/api/videos', (req: Request, res: Response) => {
     res.send(videos)
@@ -74,27 +75,37 @@ app.get('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
     const videoID: number = +req.params.id
     const foundVideo = videos.find(v => (v.id === videoID))
     if (foundVideo) {
-            res.send(foundVideo)
-            res.sendStatus(201)
-    }
-    else {
+        res.send(foundVideo)
+        res.sendStatus(201)
+    } else {
         const errorMessage: FieldError = {
             message: "Video not found",
-            field: "error field"
+            field: "404"
         }
-        res.send(errorMessage)
+        errorsMessages.push(errorMessage)
+        res.send(errorsMessages)
         res.sendStatus(404)
     }
 })
 
 app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
-    const addVideo = {
+    const addVideo: Video = {
         id: +(new Date()),
         title: req.body.title,
         author: req.body.author,
+        createdAt: (new Date().toISOString()),
+        publicationDate: (new Date().toISOString()),
         availableResolutions: req.body.availableResolutions,
     }
-    //if (addVideo.id && addVideo.title.length > 0 && )
+    if (addVideo.id &&
+        addVideo.title.length > 0 &&
+        addVideo.title.length < 40 &&
+        addVideo.author.length > 0 &&
+        addVideo.author.length < 20) {
+        videos.push(addVideo)
+        res.send(addVideo)
+        res.sendStatus(201)
+    }
 })
 
 app.put('hometask_01/api/videos/:id', (req: Request, res: Response) => {
@@ -102,7 +113,13 @@ app.put('hometask_01/api/videos/:id', (req: Request, res: Response) => {
 })
 
 app.delete('hometask_01/api/videos/:id', (req: Request, res: Response) => {
-
+    const foundVideo = videos.find(v => (v.id === +req.params.id))
+    if (foundVideo) {
+        videos = videos.filter(v => v.id !== +req.params.id)
+        res.sendStatus(204)
+    } else {
+        res.sendStatus(404)
+    }
 })
 
 
