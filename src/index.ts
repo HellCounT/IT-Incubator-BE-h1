@@ -1,7 +1,10 @@
 import express, {Request, Response} from 'express'
+import bodyParser from "body-parser"
 
 const app = express()
 const port = process.env.PORT || 3000
+
+app.use(bodyParser.json())
 
 /*enum Resolutions {
     P144,
@@ -17,8 +20,8 @@ type Video = {
     id: number,
     title: string,
     author: string,
-    canBeDownloaded: boolean,
-    minAgeRestriction: number,
+    canBeDownloaded?: false,
+    minAgeRestriction?: number,
     createdAt: string,
     publicationDate: string,
     availableResolutions: Array<string>
@@ -64,6 +67,7 @@ const videos = [
 
 app.get('/hometask_01/api/videos', (req: Request, res: Response) => {
     res.send(videos)
+    res.sendStatus(200)
 })
 
 app.get('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
@@ -71,19 +75,33 @@ app.get('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
     const foundVideo = videos.find(v => (v.id === videoID))
     if (foundVideo) {
             res.send(foundVideo)
+            res.sendStatus(201)
     }
-    else res.sendStatus(404);
+    else {
+        const errorMessage: FieldError = {
+            message: "Video not found",
+            field: "error field"
+        }
+        res.send(errorMessage)
+        res.sendStatus(404)
+    }
 })
 
 app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
+    const addVideo = {
+        id: +(new Date()),
+        title: req.body.title,
+        author: req.body.author,
+        availableResolutions: req.body.availableResolutions,
+    }
+    //if (addVideo.id && addVideo.title.length > 0 && )
+})
+
+app.put('hometask_01/api/videos/:id', (req: Request, res: Response) => {
 
 })
 
-app.put('hometask_01/api/videos/{id}', (req: Request, res: Response) => {
-
-})
-
-app.delete('hometask_01/api/videos/{id}', (req: Request, res: Response) => {
+app.delete('hometask_01/api/videos/:id', (req: Request, res: Response) => {
 
 })
 
