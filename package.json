@@ -5,6 +5,9 @@
   "repository": "git@github.com:HellCounT/IT-Incubator-BE-h1.git",
   "author": "HellCounT <a_killaheadz@live.ru>",
   "license": "MIT",
+  "scripts": {
+    "dev": "nodemon --inspect src/index.ts"
+  },
   "dependencies": {
     "express": "^4.18.2"
   },
