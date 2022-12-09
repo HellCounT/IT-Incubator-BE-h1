@@ -1,0 +1,11 @@
+{
+  "name": "h1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:HellCounT/IT-Incubator-BE-h1.git",
+  "author": "HellCounT <a_killaheadz@live.ru>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
