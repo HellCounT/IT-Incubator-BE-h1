@@ -29,7 +29,7 @@ type FieldError = {
 }
 type APIErrorResult = Array<FieldError>
 
-const videosData = [
+const videos = [
     {
         id: 1,
         title: "Funny Cats",
@@ -63,11 +63,16 @@ const videosData = [
 ]
 
 app.get('/hometask_01/api/videos', (req: Request, res: Response) => {
-
+    res.send(videos)
 })
 
-app.get('/hometask_01/api/videos/{id}', (req: Request, res: Response) => {
-
+app.get('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
+    const videoID: number = +req.params.id
+    const foundVideo = videos.find(v => (v.id === videoID))
+    if (foundVideo) {
+            res.send(foundVideo)
+    }
+    else res.sendStatus(404);
 })
 
 app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
