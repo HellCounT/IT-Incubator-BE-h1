@@ -122,14 +122,14 @@ app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
 
 })
 
-app.put('hometask_01/api/videos/:id', (req: Request, res: Response) => {
+app.put('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
     // Input validation
 
     let errors: Array<FieldError> = []
     if (req.body.title === "" ||
         req.body.title.length > 40 ||
         req.body.title.trim() === "") {
-        errors.push({message: 'Invali input', field: 'title'})
+        errors.push({message: 'Invalid input', field: 'title'})
     }
     if (req.body.author === "" ||
         req.body.author.length > 20 ||
@@ -158,12 +158,15 @@ app.put('hometask_01/api/videos/:id', (req: Request, res: Response) => {
            v.canBeDownloaded = req.body.canBeDownloaded
            v.minAgeRestriction = req.body.minAgeRestriction
            v.publicationDate = new Date().toISOString()
+           res.sendStatus(204)
        }
+       else res.sendStatus(404)
+
     })
 
 })
 
-app.delete('hometask_01/api/videos/:id', (req: Request, res: Response) => {
+app.delete('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
     const foundVideo = videos.find(v => (v.id === +req.params.id))
     if (foundVideo !== undefined) {
         videos = videos.filter(v => v.id !== +req.params.id)
@@ -174,15 +177,12 @@ app.delete('hometask_01/api/videos/:id', (req: Request, res: Response) => {
 })
 
 
-app.delete('hometask_01/api/testing/all-data', (req: Request, res: Response) => {
+app.delete('/hometask_01/api/testing/all-data', (req: Request, res: Response) => {
     videos = []
     res.sendStatus(204)
 })
 
 
 app.listen(port, () => {
-    // const dateNow = new Date()
-    // const dateNowPlusDay = new Date(+dateNow + (1000 * 60 * 60 * 24)).toISOString()
-    // console.log(dateNow, dateNowPlusDay)
     console.log(`Example app listening on port ${port}`)
 })
