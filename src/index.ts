@@ -69,11 +69,11 @@ let videos: Array<Video> = [
 ]
 // const errorsMessages: APIErrorResult = []
 
-app.get('/hometask_01/api/videos', (req: Request, res: Response) => {
+app.get('/videos', (req: Request, res: Response) => {
     res.status(200).send(videos)
 })
 
-app.get('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
+app.get('/videos/:id', (req: Request, res: Response) => {
     const videoID: number = +req.params.id
     const foundVideo = videos.find(v => (v.id === videoID))
     if (foundVideo) {
@@ -83,7 +83,7 @@ app.get('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
     }
 })
 
-app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
+app.post('/videos', (req: Request, res: Response) => {
     // Input validation
 
     let errors: Array<FieldError> = []
@@ -122,7 +122,7 @@ app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
 
 })
 
-app.put('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
+app.put('/videos/:id', (req: Request, res: Response) => {
     // Input validation
 
     let errors: Array<FieldError> = []
@@ -166,7 +166,7 @@ app.put('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
 
 })
 
-app.delete('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
+app.delete('/videos/:id', (req: Request, res: Response) => {
     const foundVideo = videos.find(v => (v.id === +req.params.id))
     if (foundVideo !== undefined) {
         videos = videos.filter(v => v.id !== +req.params.id)
