@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "name": "Videos-DB",
+  "version": 2,
+  "name": "VideosDB",
   "builds": [
     {
       "src": "src/index.ts",
