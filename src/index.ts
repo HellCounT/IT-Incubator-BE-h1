@@ -1,6 +1,5 @@
 import express, {Request, Response} from 'express'
-import { addDays } from 'date-fns'
-import e from "express";
+import {addDays} from 'date-fns'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -8,15 +7,16 @@ const port = process.env.PORT || 3000
 app.use(express.json())
 
 enum Resolutions {
-    P144= 'P144',
+    P144 = 'P144',
     P240 = 'P240',
-    P360 ='P360',
+    P360 = 'P360',
     P480 = 'P480',
     P720 = 'P720',
     P1080 = 'P1080',
     P1440 = 'P1440',
     P2160 = 'P2160',
 }
+
 type Video = {
     id: number,
     title: string,
@@ -79,17 +79,32 @@ app.get('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
     if (foundVideo) {
         res.status(200).send(foundVideo)
     } else {
-        res.sendStatus(401)
+        res.sendStatus(404)
     }
 })
 
 app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
-    // validation
+    // Input validation
+
     let errors: Array<FieldError> = []
-    if ('error in title') {
-        errors.push({message: 'invalid title', field: 'title'})
+    if (req.body.title === "" ||
+        req.body.title.length > 40 ||
+        req.body.title.trim() === "") {
+        errors.push({message: 'Invali input', field: 'title'})
     }
+    if (req.body.author === "" ||
+        req.body.author.length > 20 ||
+        req.body.author.trim() === "") {
+        errors.push({message: 'invalid input', field: 'author'})
+    }
+    if (req.body.availableResolutions.length < 1) {
+        errors.push({message: 'invalid input', field: 'availableResolutions'})
+    }
+
     if (errors.length > 0) return res.status(400).send({errorsMessages: errors})
+
+    // Video adding
+
     const dateNow = new Date()
     const addVideo: Video = {
         id: +dateNow,
@@ -104,19 +119,53 @@ app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
     videos.push(addVideo)
 
     return res.status(201).send(addVideo)
-    // res.sendStatus(201)
-    // res.status(201).send()
-    // res.send(201)
 
 })
 
 app.put('hometask_01/api/videos/:id', (req: Request, res: Response) => {
+    // Input validation
+
+    let errors: Array<FieldError> = []
+    if (req.body.title === "" ||
+        req.body.title.length > 40 ||
+        req.body.title.trim() === "") {
+        errors.push({message: 'Invali input', field: 'title'})
+    }
+    if (req.body.author === "" ||
+        req.body.author.length > 20 ||
+        req.body.author.trim() === "") {
+        errors.push({message: 'invalid input', field: 'author'})
+    }
+    if (req.body.availableResolutions.length < 1) {
+        errors.push({message: 'invalid input', field: 'availableResolutions'})
+    }
+    if (typeof(req.body.canBeDownloaded) !== "boolean") {
+        errors.push({message: 'expected boolean', field: 'canBeDownloaded'})
+    }
+    if (req.body.minAgeRestriction > 18 ||
+        (req.body.minAgeRestriction < 1 && req.body.minAgeRestriction > 0)) {
+        errors.push({message: 'invalid age restriction', field: 'minAgeRestriction'})
+    }
+
+    if (errors.length > 0) return res.status(400).send({errorsMessages: errors})
+
+    // Video updating
+    videos.forEach((v) => {
+       if (v.id === +req.params.id) {
+           v.title = req.body.title
+           v.author = req.body.author
+           v.availableResolutions = req.body.availableResolutions
+           v.canBeDownloaded = req.body.canBeDownloaded
+           v.minAgeRestriction = req.body.minAgeRestriction
+           v.publicationDate = new Date().toISOString()
+       }
+    })
 
 })
 
 app.delete('hometask_01/api/videos/:id', (req: Request, res: Response) => {
     const foundVideo = videos.find(v => (v.id === +req.params.id))
-    if (foundVideo) {
+    if (foundVideo !== undefined) {
         videos = videos.filter(v => v.id !== +req.params.id)
         res.sendStatus(204)
     } else {
@@ -125,13 +174,10 @@ app.delete('hometask_01/api/videos/:id', (req: Request, res: Response) => {
 })
 
 
-
-
 app.delete('hometask_01/api/testing/all-data', (req: Request, res: Response) => {
     videos = []
     res.sendStatus(204)
 })
-
 
 
 app.listen(port, () => {
