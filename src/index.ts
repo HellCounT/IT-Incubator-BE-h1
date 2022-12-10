@@ -90,7 +90,7 @@ app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
     if (req.body.title === "" ||
         req.body.title.length > 40 ||
         req.body.title.trim() === "") {
-        errors.push({message: 'Invali input', field: 'title'})
+        errors.push({message: 'Invalid input', field: 'title'})
     }
     if (req.body.author === "" ||
         req.body.author.length > 20 ||
@@ -177,7 +177,7 @@ app.delete('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
 })
 
 
-app.delete('/hometask_01/api/testing/all-data', (req: Request, res: Response) => {
+app.delete('/testing/all-data', (req: Request, res: Response) => {
     videos = []
     res.sendStatus(204)
 })
