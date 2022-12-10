@@ -1,27 +1,28 @@
 import express, {Request, Response} from 'express'
-import bodyParser from "body-parser"
+import { addDays } from 'date-fns'
+import e from "express";
 
 const app = express()
 const port = process.env.PORT || 3000
 
 app.use(express.json())
 
-/*enum Resolutions {
-    P144,
-    P240,
-    P360,
-    P480,
-    P720,
-    P1080,
-    P1440,
-    P2160,
-}*/
+enum Resolutions {
+    P144= 'P144',
+    P240 = 'P240',
+    P360 ='P360',
+    P480 = 'P480',
+    P720 = 'P720',
+    P1080 = 'P1080',
+    P1440 = 'P1440',
+    P2160 = 'P2160',
+}
 type Video = {
     id: number,
     title: string,
     author: string,
-    canBeDownloaded?: false,
-    minAgeRestriction?: number,
+    canBeDownloaded: boolean,
+    minAgeRestriction: number | null,
     createdAt: string,
     publicationDate: string,
     availableResolutions: Array<string>
@@ -30,9 +31,11 @@ type FieldError = {
     message: string,
     field: string
 }
-type APIErrorResult = Array<FieldError>
+type APIErrorResult = {
+    errorsMessages: Array<FieldError>
+}
 
-let videos = [
+let videos: Array<Video> = [
     {
         id: 1,
         title: "Funny Cats",
@@ -46,7 +49,7 @@ let videos = [
     {
         id: 2,
         title: "Rock am Ring 2001 Concert",
-        author: "Serg",
+        author: "Sergey",
         canBeDownloaded: false,
         minAgeRestriction: 18,
         createdAt: "2022-12-11T10:21:32.245Z",
@@ -64,48 +67,47 @@ let videos = [
         availableResolutions: ["P480", "P1440", "P2160"]
     }
 ]
-const errorsMessages: APIErrorResult = []
+// const errorsMessages: APIErrorResult = []
 
 app.get('/hometask_01/api/videos', (req: Request, res: Response) => {
-    res.send(videos)
-    res.sendStatus(200)
+    res.status(200).send(videos)
 })
 
 app.get('/hometask_01/api/videos/:id', (req: Request, res: Response) => {
     const videoID: number = +req.params.id
     const foundVideo = videos.find(v => (v.id === videoID))
     if (foundVideo) {
-        res.send(foundVideo)
-        res.sendStatus(201)
+        res.status(200).send(foundVideo)
     } else {
-        const errorMessage: FieldError = {
-            message: "Video not found",
-            field: "404"
-        }
-        errorsMessages.push(errorMessage)
-        res.send(errorsMessages)
-        res.sendStatus(404)
+        res.sendStatus(401)
     }
 })
 
 app.post('/hometask_01/api/videos', (req: Request, res: Response) => {
+    // validation
+    let errors: Array<FieldError> = []
+    if ('error in title') {
+        errors.push({message: 'invalid title', field: 'title'})
+    }
+    if (errors.length > 0) return res.status(400).send({errorsMessages: errors})
+    const dateNow = new Date()
     const addVideo: Video = {
-        id: +(new Date()),
+        id: +dateNow,
         title: req.body.title,
         author: req.body.author,
-        createdAt: (new Date().toISOString()),
-        publicationDate: (new Date().toISOString()),
+        canBeDownloaded: false,
+        minAgeRestriction: null,
+        createdAt: dateNow.toISOString(),
+        publicationDate: addDays(dateNow, 1).toISOString(),
         availableResolutions: req.body.availableResolutions,
     }
-    if (addVideo.id &&
-        addVideo.title.length > 0 &&
-        addVideo.title.length < 40 &&
-        addVideo.author.length > 0 &&
-        addVideo.author.length < 20) {
-        videos.push(addVideo)
-        res.send(addVideo)
-        res.sendStatus(201)
-    }
+    videos.push(addVideo)
+
+    return res.status(201).send(addVideo)
+    // res.sendStatus(201)
+    // res.status(201).send()
+    // res.send(201)
+
 })
 
 app.put('hometask_01/api/videos/:id', (req: Request, res: Response) => {
@@ -126,11 +128,15 @@ app.delete('hometask_01/api/videos/:id', (req: Request, res: Response) => {
 
 
 app.delete('hometask_01/api/testing/all-data', (req: Request, res: Response) => {
-
+    videos = []
+    res.sendStatus(204)
 })
 
 
 
 app.listen(port, () => {
+    // const dateNow = new Date()
+    // const dateNowPlusDay = new Date(+dateNow + (1000 * 60 * 60 * 24)).toISOString()
+    // console.log(dateNow, dateNowPlusDay)
     console.log(`Example app listening on port ${port}`)
 })
