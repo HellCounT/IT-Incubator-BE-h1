@@ -161,6 +161,9 @@ app.put('/videos/:id', (req: Request, res: Response) => {
         (req.body.minAgeRestriction < 1 && req.body.minAgeRestriction > 0)) {
         errors.push({message: 'invalid age restriction', field: 'minAgeRestriction'})
     }
+    if (req.body.publicationDate.length !== new Date().toISOString().length) {
+        errors.push({message: 'invalid publication date', field: 'minAgeRestriction'})
+    }
 
     if (errors.length > 0) {
         res.status(400).send({errorsMessages: errors})
