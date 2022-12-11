@@ -182,7 +182,7 @@ app.put('/videos/:id', (req: Request, res: Response) => {
            v.publicationDate = req.body.publicationDate
            res.sendStatus(204)
        }
-       else res.sendStatus(404)
+       else res.sendStatus(406)
 
     })
 
