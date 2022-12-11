@@ -20,9 +20,6 @@ type FieldError = {
     message: string,
     field: string
 }
-type APIErrorResult = {
-    errorsMessages: Array<FieldError>
-}
 
 const resolutions: Array<string> = [
     'P144',
