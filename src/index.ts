@@ -66,7 +66,6 @@ let videos: Array<Video> = [
         availableResolutions: ["P480", "P1440", "P2160"]
     }
 ]
-// const errorsMessages: APIErrorResult = []
 
 app.get('/videos', (req: Request, res: Response) => {
     res.status(200).send(videos)
