@@ -6,17 +6,6 @@ const port = process.env.PORT || 3000
 
 app.use(express.json())
 
-enum Resolutions {
-    P144 = 'P144',
-    P240 = 'P240',
-    P360 = 'P360',
-    P480 = 'P480',
-    P720 = 'P720',
-    P1080 = 'P1080',
-    P1440 = 'P1440',
-    P2160 = 'P2160',
-}
-
 type Video = {
     id: number,
     title: string,
@@ -34,6 +23,16 @@ type FieldError = {
 type APIErrorResult = {
     errorsMessages: Array<FieldError>
 }
+
+const resolutions: Array<string> = [
+    'P144',
+    'P240',
+    'P360',
+    'P480',
+    'P720',
+    'P1080',
+    'P1440',
+    'P2160']
 
 let videos: Array<Video> = [
     {
@@ -87,7 +86,8 @@ app.post('/videos', (req: Request, res: Response) => {
     // Input validation
 
     let errors: Array<FieldError> = []
-    if (req.body.title === "" ||
+    if (typeof(req.body.title) !== "string" ||
+        req.body.title === "" ||
         req.body.title.length > 40 ||
         req.body.title.trim() === "") {
         errors.push({message: 'Invalid input', field: 'title'})
@@ -100,8 +100,18 @@ app.post('/videos', (req: Request, res: Response) => {
     if (req.body.availableResolutions.length < 1) {
         errors.push({message: 'invalid input', field: 'availableResolutions'})
     }
+    let resCheck: boolean = true
+    req.body.availableResolutions.forEach((res:string) => {
+        if (!resolutions.includes(res)) resCheck = false
+    })
+    if (!resCheck) {
+        errors.push({message: 'invalid input', field: 'availableResolutions'})
+    }
 
-    if (errors.length > 0) return res.status(400).send({errorsMessages: errors})
+    if (errors.length > 0) {
+        res.status(400).send({errorsMessages: errors})
+        return
+    }
 
     // Video adding
 
@@ -126,7 +136,8 @@ app.put('/videos/:id', (req: Request, res: Response) => {
     // Input validation
 
     let errors: Array<FieldError> = []
-    if (req.body.title === "" ||
+    if (typeof(req.body.title) !== "string" ||
+        req.body.title === "" ||
         req.body.title.length > 40 ||
         req.body.title.trim() === "") {
         errors.push({message: 'Invalid input', field: 'title'})
@@ -139,6 +150,14 @@ app.put('/videos/:id', (req: Request, res: Response) => {
     if (req.body.availableResolutions.length < 1) {
         errors.push({message: 'invalid input', field: 'availableResolutions'})
     }
+    let resCheck: boolean = true
+    req.body.availableResolutions.forEach((res:string) => {
+        if (!resolutions.includes(res)) resCheck = false
+    })
+    if (!resCheck) {
+        errors.push({message: 'invalid input', field: 'availableResolutions'})
+    }
+
     if (typeof(req.body.canBeDownloaded) !== "boolean") {
         errors.push({message: 'expected boolean', field: 'canBeDownloaded'})
     }
@@ -147,9 +166,13 @@ app.put('/videos/:id', (req: Request, res: Response) => {
         errors.push({message: 'invalid age restriction', field: 'minAgeRestriction'})
     }
 
-    if (errors.length > 0) return res.status(400).send({errorsMessages: errors})
+    if (errors.length > 0) {
+        res.status(400).send({errorsMessages: errors})
+        return
+    }
 
     // Video updating
+
     videos.forEach((v) => {
        if (v.id === +req.params.id) {
            v.title = req.body.title
