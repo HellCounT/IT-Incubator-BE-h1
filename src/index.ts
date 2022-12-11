@@ -1,5 +1,6 @@
 import express, {Request, Response} from 'express'
 import {addDays} from 'date-fns'
+import {id} from "date-fns/locale";
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -171,7 +172,7 @@ app.put('/videos/:id', (req: Request, res: Response) => {
     }
 
     // Video updating
-
+    if (!(videos.find(v => v.id === +req.params.id))) res.sendStatus(404)
     videos.forEach((v) => {
        if (v.id === +req.params.id) {
            v.title = req.body.title
@@ -182,7 +183,6 @@ app.put('/videos/:id', (req: Request, res: Response) => {
            v.publicationDate = req.body.publicationDate
            res.sendStatus(204)
        }
-
     })
 
 })
